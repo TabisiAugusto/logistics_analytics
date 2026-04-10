@@ -1,0 +1,14 @@
+version: 2
+sources:
+  - name: logistics_raw
+    database: portfolio-logistics-raw-at11
+    schema: logistics_staging
+    tables:
+      - name: drivers
+      - name: trips
+      - name: fuel_purchases
+      - name: customers
+      - name: routes
+      - name: loads
+      - name: maintenance_records
+      - name: trucks
