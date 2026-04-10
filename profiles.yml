@@ -1,0 +1,83 @@
+user:
+  outputs:
+    default:
+      keyfile_json:
+        auth_provider_x509_cert_url: https://www.googleapis.com/oauth2/v1/certs
+        auth_uri: https://accounts.google.com/o/oauth2/auth
+        client_email: dbt-runner@portfolio-logistics-raw-at11.iam.gserviceaccount.com
+        client_id: '103801135051554410331'
+        client_x509_cert_url: https://www.googleapis.com/robot/v1/metadata/x509/dbt-runner%40portfolio-logistics-raw-at11.iam.gserviceaccount.com
+        private_key: '-----BEGIN PRIVATE KEY-----
+
+          MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDBbH/4EmLEfTVR
+
+          HMy4VNOguQL3HmBGwIv+emef0Nv4r9xC1g8CtgFh/FGX2qtetENVJDkOYyAkruuA
+
+          nHfpVFSV8Vw0jKYFN4V77h0mJJPOHjwXJLw6iPer4Os5fRtOtqi32tYlelI7GO/w
+
+          mrX92DkjBhxjhfoDkzCD1QT7x3ISztSb0xD6oUeMTk9yi34kXUFrHbETDijq0k41
+
+          bta8b7zs/1IirMvAefdK0otWqxEoIGaM3adA5Eec69wg5KAJgIeccBgVfmzwmXK7
+
+          ECH1KcaJUJhnmZYxPolI0mBYPrBeveDTDTLCLDEHuPsU+qGYtuB4hBseo6Bqzd9k
+
+          OEfu48JTAgMBAAECggEAX/IvRGHyZl9pnDO6BVHmrFo581U5Er+ecfxL/MXA6Aps
+
+          Kyc9yO15oB5mZvpMeazXnZtbRhy7rBassV5sSOzRDJPuVg7Sp9HTwBbslKgePWdY
+
+          DW7mg+6/VJ48cIbzjccjyBeglHSp57DGDMbhseqY5Ru551BlJXLU5QA8+ZwEpPjg
+
+          0JZApIuBo9tidZ1DUmoycyra9AL0ze4Y5G1zlGhUf3c/qlr5nd4VZZ695wKx2wVU
+
+          Yg4fqGNxCYIl03w+Aa0JZRORygQo7R60y8cDKbiBYTZbgBZkvo9t+YUUwI3fjx7s
+
+          IlXJ0VWNDYY0kKaD0pPL8GU4ElG2rgg94x+HfkoOGQKBgQDt/nY7290admCK0NI8
+
+          dAPWuDJltXVvsB0PsmSeL/MSFfiY3H5H/s6OpW7UCp1B0EY7Z5zMfakyvqqWVgFP
+
+          mpgw6Gmlwb28uNKgdQVtnf5SNwhy6LcfuHfyBIGREOb4k6eb0l6BqmlQoePKHCaw
+
+          UfS/dpsDzPjRANh27jVEShlGVQKBgQDQDso1+ynWa9ePD1OWF8eqDF+wpMr3QnMb
+
+          CjcNPyZcZLPnbl6NArWcw3A9mErhLoQoTLm14ZRKhu41C7xkshInK56CSN7FM61C
+
+          uJrmOqZo6cMvB0irnmhjldepmdVh1y3GDUpbxN5pVsY0eDF/oqDIgHDM/C5DZyno
+
+          2xSwLEF+BwKBgQCEHKlNeTM3qVbWOC08Wbp3yzBOvXg/U6gOOp0YIs3v0Dp7wIpp
+
+          NM086iCnnGzHR/J0r4OfEHKINMdFRODda5foLlvXI8FLrd1eLReiTf4LbXlHMF/X
+
+          P/N1aYLzIErW2kBEg3bqy8pCdFuaqh3f6t7OGezbI0FL5AhFnN381pVJMQKBgEfP
+
+          kwOmuP4FItWB2LvJYWTT+IMjndpR2SDQGcg8r6TcLSwH8CKDeOOuoSLhWZb3Uy4F
+
+          rWOVhHVktPsiHdgzjghvCbq2JA20lGyfAvfL7nvvkyq8PNzfQ/B7W4ByVC/88ROW
+
+          qr+Z55o8FRUvFwaSvyP1EPnvYJhrFxAD7dQQslopAoGBAL1L0m+vWdsIKOOKgQ7u
+
+          NT2Hgvz6pVxU/hjAiN3zTiqtkh8LwsSKnJg85+ALIVxunT1DaOxf41kgSzKG0e+L
+
+          m8EpeG/TD+kHw0VJVcXY0Cv6w93ElVZqs88gEcr2zEZAsnhObe99ReycskXcOjLd
+
+          ct/d2FPkGtGIZfdiDn7ijo6c
+
+          -----END PRIVATE KEY-----
+
+          '
+        private_key_id: 6c5d62093d6a9688404b53b7cc106f3fcf609ab8
+        project_id: portfolio-logistics-raw-at11
+        token_uri: https://oauth2.googleapis.com/token
+        type: service_account
+      location: us-central1
+      method: service-account-json
+      project: portfolio-logistics-raw-at11
+      schema: dbt_augusto
+      scopes:
+      - https://www.googleapis.com/auth/bigquery
+      - https://www.googleapis.com/auth/cloud-platform
+      - https://www.googleapis.com/auth/drive
+      - https://www.googleapis.com/auth/userinfo.email
+      target_name: default
+      threads: 4
+      type: bigquery
+  target: default
