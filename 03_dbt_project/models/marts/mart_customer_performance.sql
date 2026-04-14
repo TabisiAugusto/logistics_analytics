@@ -70,7 +70,7 @@ SELECT
     
     -- Métricas Operativas
     COALESCE(cm.avg_weight_lbs, 0) as avg_weight_lbs,
-    COALESCE(cm.avg_distance_variance, 0) as avg_distance_variance, -- <--- AQUÍ ESTABA EL ERROR (FALTABA LA COMA)
+    COALESCE(cm.avg_distance_variance, 0) as avg_distance_variance,
 
     -- Métrica de Riesgo/Participación
     SAFE_DIVIDE(

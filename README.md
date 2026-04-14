@@ -35,14 +35,20 @@ El reporte en Looker Studio se divide en tres áreas estratégicas:
 - **Ranking de Costos Críticos:** Tabla de control que destaca unidades con alto **Costo de Mantenimiento por Milla** (ej. International 2015 con $0.06/milla), permitiendo priorizar renovaciones.
 - **Distribución:** Desglose de la flota por fabricante (PACCAR y Navistar como líderes de volumen).
 
+![Dashboard - Rendimiento de Flota](visuals/dashboard1.png)
+
 ### 2. Desempeño de Conductores
 - **Ranking de Eficiencia:** Comparativa de conductores frente al **Margen Promedio por Milla** de la flota para identificar los perfiles más rentables.
 - **Volumen vs. Rentabilidad:** Análisis de la relación entre millas conducidas y ganancia bruta generada.
 - **Curva de Aprendizaje:** El gráfico combinado confirma que los conductores con mayores **años de experiencia** generan una ganancia bruta total superior.
 
+![Dashboard - Desempeño de Conductores](visuals/dashboard2.png)
+
 ### 3. Análisis de Clientes
 - **Concentración (Top 10):** Identificación de los clientes principales que sostienen el volumen de ingresos, con líneas de referencia para comparar la ganancia promedio.
 - **Relación Peso vs. Ingreso:** Análisis del peso promedio de carga (`avg_weight_lbs`) frente al ingreso por viaje para detectar si el peso de la mercancía está correctamente tarifado o si existen ineficiencias comerciales.
+
+![Dashboard - Análisis de Clientes](visuals/dashboard4.png)
 
 ## 💡 Conclusiones de Negocio
 Este pipeline permite a la gerencia pasar de una gestión reactiva a una basada en datos. Mediante el monitoreo del **margen neto por milla** y el control de **costos de mantenimiento críticos**, la empresa puede identificar qué activos y recursos humanos están optimizando la rentabilidad y cuáles requieren intervención inmediata para mejorar el margen operativo neto.
