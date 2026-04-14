@@ -1,0 +1,219 @@
+version: 2
+
+models:
+  # ==========================================
+  # STAGING MODELS — Capa de Limpieza y Normalización
+  # Cada modelo realiza un SELECT directo desde las fuentes crudas,
+  # seleccionando y renombrando columnas para estandarizar el esquema.
+  # ==========================================
+
+  - name: stg_trips
+    description: >
+      Viajes operativos realizados por la flota. Cada registro representa un viaje único
+      con su distancia real, duración y consumo de combustible. Es la tabla transaccional
+      principal del pipeline.
+    columns:
+      - name: trip_id
+        description: Identificador único del viaje.
+        tests:
+          - unique
+          - not_null
+      - name: load_id
+        description: FK a la carga transportada en el viaje.
+        tests:
+          - not_null
+      - name: driver_id
+        description: FK al conductor asignado al viaje.
+        tests:
+          - not_null
+      - name: truck_id
+        description: FK al camión utilizado en el viaje.
+        tests:
+          - not_null
+      - name: dispatch_date
+        description: Fecha de despacho del viaje.
+        tests:
+          - not_null
+      - name: actual_distance_miles
+        description: Distancia real recorrida en millas.
+      - name: actual_duration_hours
+        description: Duración real del viaje en horas.
+      - name: fuel_gallons_used
+        description: Galones de combustible consumidos durante el viaje.
+      - name: average_mpg
+        description: Millas por galón promedio del viaje.
+
+  - name: stg_trucks
+    description: >
+      Dimensión de camiones de la flota. Contiene los atributos físicos y operativos
+      de cada unidad, incluyendo fabricante, año de modelo y tipo de combustible.
+    columns:
+      - name: truck_id
+        description: Identificador único del camión.
+        tests:
+          - unique
+          - not_null
+      - name: make
+        description: Fabricante del camión (ej. PACCAR, Navistar, Daimler).
+        tests:
+          - not_null
+      - name: model_year
+        description: Año de fabricación del modelo.
+      - name: fuel_type
+        description: Tipo de combustible utilizado (ej. Diesel, Gas).
+      - name: tank_capacity_gallons
+        description: Capacidad del tanque de combustible en galones.
+      - name: truck_status
+        description: Estado operativo actual del camión (ej. Active, Maintenance).
+
+  - name: stg_drivers
+    description: >
+      Dimensión de conductores. Contiene los datos personales y la fecha de contratación
+      para calcular años de experiencia en los marts.
+    columns:
+      - name: driver_id
+        description: Identificador único del conductor.
+        tests:
+          - unique
+          - not_null
+      - name: first_name
+        description: Nombre del conductor.
+        tests:
+          - not_null
+      - name: last_name
+        description: Apellido del conductor.
+        tests:
+          - not_null
+      - name: hire_date
+        description: Fecha de contratación. Se usa para calcular años de experiencia.
+        tests:
+          - not_null
+
+  - name: stg_customers
+    description: >
+      Dimensión de clientes. Incluye tipo de cliente, estado de cuenta y potencial
+      de ingresos anuales para análisis de concentración comercial.
+    columns:
+      - name: customer_id
+        description: Identificador único del cliente.
+        tests:
+          - unique
+          - not_null
+      - name: customer_name
+        description: Nombre comercial del cliente.
+      - name: customer_type
+        description: Clasificación del cliente (ej. Enterprise, SMB).
+      - name: account_status
+        description: Estado de la cuenta (ej. Active, Inactive).
+      - name: contract_start_date
+        description: Fecha de inicio del contrato comercial.
+      - name: annual_revenue_potential
+        description: Potencial de ingresos anuales estimado en USD.
+
+  - name: stg_loads
+    description: >
+      Cargas transportadas. Cada registro contiene la información comercial del flete,
+      incluyendo ingresos base, recargo por combustible y peso de la carga.
+    columns:
+      - name: load_id
+        description: Identificador único de la carga.
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: FK al cliente que contrató el flete.
+        tests:
+          - not_null
+      - name: route_id
+        description: FK a la ruta asignada a la carga.
+        tests:
+          - not_null
+      - name: load_date
+        description: Fecha de la carga.
+      - name: load_type
+        description: Tipo de carga (ej. Full Truckload, LTL).
+      - name: weight_lbs
+        description: Peso de la carga en libras.
+      - name: revenue
+        description: Ingreso base del flete en USD.
+        tests:
+          - not_null
+      - name: fuel_surcharge
+        description: Recargo por combustible aplicado en USD.
+
+  - name: stg_routes
+    description: >
+      Rutas operativas de la red logística. Define los pares origen-destino con la
+      distancia típica y las tarifas base para comparar contra la operación real.
+    columns:
+      - name: route_id
+        description: Identificador único de la ruta.
+        tests:
+          - unique
+          - not_null
+      - name: origin_city
+        description: Ciudad de origen del flete.
+        tests:
+          - not_null
+      - name: destination_city
+        description: Ciudad de destino del flete.
+        tests:
+          - not_null
+      - name: typical_distance_miles
+        description: Distancia típica de la ruta en millas (referencia operativa).
+      - name: base_rate_per_mile
+        description: Tarifa base por milla de la ruta en USD.
+      - name: fuel_surcharge_rate
+        description: Tasa de recargo por combustible de la ruta.
+
+  - name: stg_fuel_purchases
+    description: >
+      Compras de combustible realizadas durante los viajes. Permite calcular el costo
+      real de combustible por viaje para determinar el margen bruto.
+    columns:
+      - name: fuel_purchase_id
+        description: Identificador único de la compra de combustible.
+        tests:
+          - unique
+          - not_null
+      - name: trip_id
+        description: FK al viaje asociado a la compra.
+        tests:
+          - not_null
+      - name: truck_id
+        description: FK al camión que realizó la compra.
+      - name: driver_id
+        description: FK al conductor que realizó la compra.
+      - name: purchase_date
+        description: Fecha de la compra de combustible.
+      - name: location_city
+        description: Ciudad donde se realizó la compra.
+      - name: gallons
+        description: Galones de combustible comprados.
+      - name: price_per_gallon
+        description: Precio por galón en USD al momento de la compra.
+      - name: total_cost
+        description: Costo total de la compra en USD (gallons × price_per_gallon).
+
+  - name: stg_maintenance
+    description: >
+      Registros de mantenimiento de la flota. Cada evento tiene un tipo y costo asociado
+      que se agrega a nivel de camión para calcular el Margen Operativo Neto.
+    columns:
+      - name: maintenance_id
+        description: Identificador único del evento de mantenimiento.
+        tests:
+          - unique
+          - not_null
+      - name: truck_id
+        description: FK al camión que recibió el mantenimiento.
+        tests:
+          - not_null
+      - name: maintenance_date
+        description: Fecha del evento de mantenimiento.
+      - name: maintenance_type
+        description: Tipo de mantenimiento realizado (ej. Preventive, Corrective).
+      - name: maintenance_cost
+        description: Costo del mantenimiento en USD. Renombrado desde total_cost en la fuente.
+        tests:
+          - not_null

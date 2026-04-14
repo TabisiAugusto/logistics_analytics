@@ -1,0 +1,172 @@
+version: 2
+
+models:
+  # ==========================================
+  # MARTS MODELS — Capa de Negocio
+  # Modelos finales listos para consumo por herramientas de BI.
+  # Cada mart agrega métricas a nivel de una entidad de negocio específica.
+  # ==========================================
+
+  - name: fct_trip_profitability
+    description: >
+      Tabla de hechos de rentabilidad por viaje. Centraliza la lógica financiera uniendo
+      viajes, cargas, rutas y combustible para calcular ingresos, costos y márgenes a
+      nivel de cada viaje individual. Es la tabla base que alimenta los marts de negocio.
+    columns:
+      - name: trip_id
+        description: Identificador único del viaje. Clave primaria de la tabla.
+        tests:
+          - unique
+          - not_null
+      - name: dispatch_date
+        description: Fecha de despacho del viaje.
+      - name: origin_city
+        description: Ciudad de origen de la ruta.
+      - name: destination_city
+        description: Ciudad de destino de la ruta.
+      - name: typical_distance_miles
+        description: Distancia típica esperada para la ruta en millas.
+      - name: actual_distance_miles
+        description: Distancia real recorrida en millas.
+      - name: base_revenue
+        description: Ingreso base del flete en USD (sin recargo por combustible).
+      - name: fuel_surcharge
+        description: Recargo por combustible cobrado al cliente en USD.
+      - name: total_trip_revenue
+        description: Ingreso total del viaje (base_revenue + fuel_surcharge).
+        tests:
+          - not_null
+      - name: fuel_cost_paid
+        description: Costo real de combustible comprado durante el viaje en USD.
+      - name: gross_margin
+        description: Margen bruto real (total_trip_revenue - fuel_cost_paid).
+      - name: theoretical_fuel_cost
+        description: >
+          Costo teórico de combustible calculado como fuel_gallons_used × $3.50.
+          Usa un precio promedio fijo para normalizar la comparación entre viajes.
+      - name: theoretical_gross_margin
+        description: >
+          Margen bruto teórico (total_trip_revenue - theoretical_fuel_cost).
+          Métrica principal para agregar en los marts de truck y driver.
+      - name: theoretical_margin_per_mile
+        description: Margen teórico por milla (theoretical_gross_margin / actual_distance_miles).
+      - name: distance_variance
+        description: >
+          Diferencia entre la distancia real y la distancia típica de la ruta.
+          Valores positivos indican desvíos; útil para detectar ineficiencias operativas.
+
+  - name: mart_truck_performance
+    description: >
+      Rendimiento financiero y operativo de cada camión de la flota. Combina métricas
+      comerciales (ingresos, margen bruto) con costos de mantenimiento para calcular el
+      Margen Operativo Neto, el KPI definitivo de rentabilidad por activo. Granularidad:
+      un registro por truck_id.
+    columns:
+      - name: truck_id
+        description: Identificador único del camión. Clave primaria.
+        tests:
+          - unique
+          - not_null
+      - name: make
+        description: Fabricante del camión (ej. PACCAR, Navistar, Daimler).
+      - name: model_year
+        description: Año de fabricación del modelo.
+      - name: truck_age_years
+        description: Antigüedad del camión en años (año actual - model_year).
+      - name: fuel_type
+        description: Tipo de combustible utilizado.
+      - name: truck_status
+        description: Estado operativo actual del camión.
+      - name: total_trips
+        description: Cantidad total de viajes realizados por el camión.
+      - name: total_miles_driven
+        description: Total de millas recorridas por el camión.
+      - name: total_gross_margin_generated
+        description: Margen bruto teórico total generado por el camión en USD.
+      - name: gross_margin_per_mile
+        description: Margen bruto por milla (total_gross_margin / total_miles_driven).
+      - name: total_maintenance_events
+        description: Cantidad total de eventos de mantenimiento registrados.
+      - name: total_maintenance_cost
+        description: Costo total de mantenimiento acumulado en USD.
+      - name: maintenance_cost_per_mile
+        description: Costo de mantenimiento por milla (total_maintenance_cost / total_miles_driven).
+      - name: net_operating_margin
+        description: >
+          Margen Operativo Neto (total_gross_margin - total_maintenance_cost).
+          KPI definitivo que determina si un camión es rentable o genera pérdida.
+          Valores negativos indican unidades por debajo del breakeven.
+
+  - name: mart_driver_performance
+    description: >
+      Desempeño financiero y operativo de cada conductor. Mide volumen de trabajo,
+      rentabilidad por milla y participación en el total de viajes. Granularidad:
+      un registro por driver_id.
+    columns:
+      - name: driver_id
+        description: Identificador único del conductor. Clave primaria.
+        tests:
+          - unique
+          - not_null
+      - name: driver_name
+        description: Nombre completo del conductor (first_name + last_name).
+        tests:
+          - not_null
+      - name: years_of_experience
+        description: Años de experiencia del conductor (fecha actual - hire_date).
+      - name: total_trips
+        description: Cantidad total de viajes realizados por el conductor.
+      - name: total_miles_driven
+        description: Total de millas conducidas.
+      - name: total_revenue_generated
+        description: Ingresos totales generados por los viajes del conductor en USD.
+      - name: total_gross_margin_generated
+        description: Margen bruto teórico total generado en USD.
+      - name: avg_margin_per_mile
+        description: >
+          Margen promedio por milla (total_gross_margin / total_miles_driven).
+          KPI principal para comparar conductores eliminando el sesgo de distancia.
+          Media de flota: $3.58.
+      - name: avg_distance_variance
+        description: Desvío promedio de distancia respecto a la ruta típica.
+      - name: share_of_total_trips_pct
+        description: Porcentaje de participación del conductor en el total de viajes de la flota.
+
+  - name: mart_customer_performance
+    description: >
+      Rendimiento comercial y operativo de cada cliente. Analiza volumen de ingresos,
+      rentabilidad, peso promedio de carga y concentración de demanda para identificar
+      clientes clave y detectar ineficiencias de tarificación. Granularidad:
+      un registro por customer_id.
+    columns:
+      - name: customer_id
+        description: Identificador único del cliente. Clave primaria.
+        tests:
+          - unique
+          - not_null
+      - name: customer_name
+        description: Nombre comercial del cliente.
+      - name: customer_type
+        description: Clasificación del cliente (ej. Enterprise, SMB).
+      - name: account_status
+        description: Estado de la cuenta del cliente (ej. Active, Inactive).
+      - name: total_trips
+        description: Cantidad total de viajes contratados por el cliente.
+      - name: total_revenue
+        description: Ingresos totales generados por el cliente en USD.
+      - name: avg_revenue_per_trip
+        description: Ingreso promedio por viaje (total_revenue / total_trips).
+      - name: total_gross_margin
+        description: Margen bruto teórico total generado por el cliente en USD.
+      - name: margin_percentage
+        description: Porcentaje de margen bruto sobre ingresos (total_gross_margin / total_revenue × 100).
+      - name: avg_margin_per_mile
+        description: Margen promedio por milla para los viajes del cliente.
+      - name: avg_weight_lbs
+        description: >
+          Peso promedio de la carga del cliente en libras. Se cruza con ingreso
+          por viaje para detectar fletes pesados sub-tarifados.
+      - name: avg_distance_variance
+        description: Desvío promedio de distancia respecto a la ruta típica.
+      - name: share_of_total_trips_pct
+        description: Porcentaje de participación del cliente en el total de viajes.
